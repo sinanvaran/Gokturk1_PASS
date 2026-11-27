@@ -13,6 +13,13 @@ main{max-width:1240px;margin:auto;padding:28px 22px 50px}.top{display:flex;justi
 .passes{margin-top:14px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px;min-width:580px}th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;padding:10px;border-bottom:1px solid var(--line)}td{padding:12px 10px;border-bottom:1px solid #1b2b40}tr:last-child td{border:0}.good{color:var(--green);font-weight:700}.dim{color:var(--muted)}.tag{border:1px solid #31516c;border-radius:20px;padding:3px 8px;font-size:11px;color:#b6d7ec}.source{margin-top:14px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.source a{color:var(--cyan)}.error{color:#ff9b9b}.notice{color:var(--muted);font-size:12px;margin-top:10px}.empty{padding:30px;text-align:center;color:var(--muted)}
 @media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.main-grid{grid-template-columns:1fr}}@media(max-width:520px){main{padding:18px 12px}.top{align-items:flex-start;flex-direction:column}.grid{gap:8px}.metric{padding:13px}.metric .v{font-size:20px}.settings{grid-template-columns:1fr 1fr}#map{height:310px}}
 input{font-size:16px!important}
+.reminder{margin-top:14px}.rem-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rem-block h3{font-size:12px;color:var(--muted);font-weight:600;margin:0 0 8px;letter-spacing:.3px}
+.check{display:flex;align-items:center;gap:9px;padding:7px 0;cursor:pointer}.check input{width:20px;height:20px;accent-color:#21a9b9}
+.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{padding:8px 12px;border-radius:20px;background:#091525;border-color:#2b405a;color:#b6d7ec;font-weight:600}.chip.on{background:#0e8191;border-color:#21a9b9;color:#fff}
+.rem-row{display:flex;gap:10px;margin-top:10px}.rem-row .field{flex:1}#remSummary{color:var(--text);font-size:13px;margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#0b1626}
+#remStatus.error{color:#ff9b9b}.linkbtn{background:none;border:0;color:var(--cyan);padding:0;font-weight:500;text-decoration:underline;font-size:12px}
+#remBanner{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 10px);z-index:1000;background:#0e8191;border:1px solid #21a9b9;border-radius:14px;padding:12px 14px;box-shadow:0 8px 30px #000a;display:flex;flex-direction:column;gap:2px}#remBanner span{font-size:13px;opacity:.9}#remBanner[hidden]{display:none}
+@media(max-width:850px){.rem-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><main>
@@ -38,6 +45,26 @@ input{font-size:16px!important}
  </div>
 </section>
 <section class="panel passes"><div class="panel-head"><h2>Uydu geçişleri • 07:00–07:00</h2><span class="small" id="count">—</span></div><div class="table-wrap"><table><thead><tr><th>TARİH</th><th>AOS / BAŞLANGIÇ</th><th>MAX ELEVATION</th><th>LOS / BİTİŞ</th><th>SÜRE</th></tr></thead><tbody id="passbody"><tr><td colspan="5" class="empty">TLE verisi alınıyor ve geçişler hesaplanıyor…</td></tr></tbody></table></div></section>
+<section class="panel reminder" id="reminder"><div class="panel-head"><h2>Geçiş öncesi hatırlatma</h2><span class="tag">ALARM</span></div>
+ <div class="rem-grid">
+  <div class="rem-block"><h3>HANGİ GEÇİŞLER?</h3>
+   <label class="check"><input type="checkbox" id="remMorning"> Sabah geçişleri (07:00 – 19:00)</label>
+   <label class="check"><input type="checkbox" id="remEvening"> Akşam geçişleri (19:00 – 07:00)</label>
+  </div>
+  <div class="rem-block"><h3>GEÇİŞTEN NE KADAR ÖNCE? (birden fazla seçebilirsin)</h3>
+   <div class="chips" id="remChips"></div>
+   <div class="rem-row"><div class="field"><label for="remCustom">Diğer süreler (dk, virgülle)</label><input id="remCustom" inputmode="numeric" placeholder="örn. 3, 25, 90"></div>
+   <div class="field"><label for="remDays">Takvime eklenecek gün</label><input id="remDays" type="number" min="1" max="14" step="1" value="7"></div></div>
+  </div>
+ </div>
+ <div id="remSummary">—</div>
+ <div class="actions"><button class="primary" id="remIcs">📅 Takvime ekle (alarmlı)</button><button id="remShare" hidden>Paylaş…</button></div>
+ <div class="notice" id="remStatus">Takvim alarmları uygulama kapalıyken de çalar. TLE güncellendikçe saatler birkaç saniye kayabileceği için haftada bir yeniden eklemen önerilir.</div>
+ <div class="notice">Takvim ekranı açılmazsa: <button class="linkbtn" id="remData">alternatif yöntemle aç</button></div>
+ <label class="check" style="margin-top:8px"><input type="checkbox" id="remLive"> Uygulama açıkken de anlık bildirim göster</label>
+ <div class="notice" id="remLiveNote"></div>
+</section>
+<div id="remBanner" hidden role="alert"><b></b><span></span></div>
 <div class="source"><span>Yörünge verisi: <a href="https://tle.ivanstanojevic.me/api/tle/41875" target="_blank" rel="noopener">GÖKTÜRK-1 TLE verisini aç (JSON)</a> • NORAD 41875</span><span id="updated">Son güncelleme: —</span></div>
 </main>
 <script src="leaflet.js"></script>
@@ -282,4 +309,4 @@ if (!activeTle) showTLE('TLE veya JSON dosyası yükleyebilirsin.');
 loadTLE();
 setInterval(updateMap, 5000);
 setInterval(loadTLE, refreshMs);
-</script><script>if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(console.error);</script></body></html>
+</script><script src="remind.js"></script><script>if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(console.error);</script></body></html>
